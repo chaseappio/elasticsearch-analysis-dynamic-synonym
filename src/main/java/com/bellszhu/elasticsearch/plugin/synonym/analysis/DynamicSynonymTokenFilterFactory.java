@@ -47,6 +47,7 @@ public class DynamicSynonymTokenFilterFactory extends
     });
     private volatile ScheduledFuture<?> scheduledFuture;
 
+    private final IndexSettings indexSettings;
     private final String location;
     private final boolean expand;
     private final boolean lenient;
@@ -65,6 +66,7 @@ public class DynamicSynonymTokenFilterFactory extends
     ) throws IOException {
         super(name, settings);
 
+        this.indexSettings = indexSettings;
         this.location = settings.get("synonyms_path");
         if (this.location == null) {
             throw new IllegalArgumentException(
@@ -163,12 +165,12 @@ public class DynamicSynonymTokenFilterFactory extends
             SynonymFile synonymFile;
             if (location.startsWith("http://") || location.startsWith("https://")) {
                 synonymFile = new RemoteSynonymFile(
-                        environment, analyzer, expand, lenient,  format, location);
+                        this.indexSettings.getIndex().getName(), environment, analyzer, expand, lenient,  format, location);
             } else {
                 synonymFile = new LocalSynonymFile(
                         environment, analyzer, expand, lenient, format, location);
             }
-            if (scheduledFuture == null) {
+            if (scheduledFuture == null && interval > 0) {
                 scheduledFuture = pool.scheduleAtFixedRate(new Monitor(synonymFile),
                                 interval, interval, TimeUnit.SECONDS);
             }

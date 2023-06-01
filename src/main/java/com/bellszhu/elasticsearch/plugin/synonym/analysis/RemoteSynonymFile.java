@@ -45,6 +45,8 @@ public class RemoteSynonymFile implements SynonymFile {
 
     private boolean lenient;
 
+    private String indexName;
+
     private Analyzer analyzer;
 
     private Environment env;
@@ -58,8 +60,9 @@ public class RemoteSynonymFile implements SynonymFile {
 
     private String eTags;
 
-    RemoteSynonymFile(Environment env, Analyzer analyzer,
+    RemoteSynonymFile(String indexName, Environment env, Analyzer analyzer,
                       boolean expand, boolean lenient, String format, String location) {
+        this.indexName = indexName;
         this.analyzer = analyzer;
         this.expand = expand;
         this.lenient = lenient;
@@ -134,7 +137,7 @@ public class RemoteSynonymFile implements SynonymFile {
                 .build();
         CloseableHttpResponse response = null;
         BufferedReader br = null;
-        HttpGet get = new HttpGet(location);
+        HttpGet get = new HttpGet(location + "?indexName=" + this.indexName);
         get.setConfig(rc);
         try {
             response = executeHttpRequest(get);
@@ -191,7 +194,7 @@ public class RemoteSynonymFile implements SynonymFile {
                 .setConnectionRequestTimeout(10 * 1000)
                 .setConnectTimeout(10 * 1000).setSocketTimeout(15 * 1000)
                 .build();
-        HttpHead head = AccessController.doPrivileged((PrivilegedAction<HttpHead>) () -> new HttpHead(location));
+        HttpHead head = AccessController.doPrivileged((PrivilegedAction<HttpHead>) () -> new HttpHead(location + "?indexName=" + this.indexName));
         head.setConfig(rc);
 
         // 设置请求头
