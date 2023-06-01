@@ -63,7 +63,7 @@ public class DynamicSynonymTokenFilterFactory extends
             String name,
             Settings settings
     ) throws IOException {
-        super(indexSettings, name, settings);
+        super(name, settings);
 
         this.location = settings.get("synonyms_path");
         if (this.location == null) {
