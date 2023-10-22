@@ -22,8 +22,8 @@ public class DynamicSynonymPlugin extends Plugin implements AnalysisPlugin {
     @Override
     public Map<String, AnalysisProvider<TokenFilterFactory>> getTokenFilters() {
         Map<String, AnalysisProvider<TokenFilterFactory>> extra = new HashMap<>();
-        extra.put("dynamic_synonym", requiresAnalysisSettings((indexSettings, env, name, settings) -> new DynamicSynonymTokenFilterFactory(env, name, settings)));
-        extra.put("dynamic_synonym_graph", requiresAnalysisSettings((indexSettings, env, name, settings) -> new DynamicSynonymGraphTokenFilterFactory(env, name, settings)));
+        extra.put("dynamic_synonym", requiresAnalysisSettings((indexSettings, env, name, settings) -> new DynamicSynonymTokenFilterFactory(indexSettings,env, name, settings)));
+        extra.put("dynamic_synonym_graph", requiresAnalysisSettings((indexSettings, env, name, settings) -> new DynamicSynonymGraphTokenFilterFactory(indexSettings,env, name, settings)));
         return extra;
     }
 }
