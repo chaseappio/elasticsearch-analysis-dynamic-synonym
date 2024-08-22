@@ -1,0 +1,10 @@
+encryptionsalt: v1:jPdTm0kpOhI=:v1:b+xGt5YHnpNscV65:Be31gFeOrY4bF9IJxpIALoiz0ACMHg==
+config:
+  aws:region: us-east-1
+  elasticsearch-synonym.stg:natIps: 
+    - "40.88.209.55/32" #prod
+    - "40.88.238.230/32" #london
+    - "52.249.234.12/32" #paris
+    - "50.19.198.197/32" #acme
+    - "44.195.133.252/32" #acme
+    - "34.199.210.195/32" #acme     
