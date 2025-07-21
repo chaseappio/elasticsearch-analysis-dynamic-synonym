@@ -13,6 +13,7 @@ import org.elasticsearch.index.analysis.AnalysisMode;
 import org.elasticsearch.index.analysis.CharFilterFactory;
 import org.elasticsearch.index.analysis.TokenFilterFactory;
 import org.elasticsearch.index.analysis.TokenizerFactory;
+import org.elasticsearch.index.IndexService;
 
 public class DynamicSynonymGraphTokenFilterFactory extends DynamicSynonymTokenFilterFactory {
 
@@ -29,13 +30,15 @@ public class DynamicSynonymGraphTokenFilterFactory extends DynamicSynonymTokenFi
         );
     }
 
-    @Override
     public TokenFilterFactory getChainAwareTokenFilterFactory(
-            TokenizerFactory tokenizer, List<CharFilterFactory> charFilters,
+            IndexService.IndexCreationContext context,
+            TokenizerFactory tokenizer,
+            List<CharFilterFactory> charFilters,
             List<TokenFilterFactory> previousTokenFilters,
             Function<String, TokenFilterFactory> allFilters
     ) {
-        final Analyzer analyzer = buildSynonymAnalyzer(tokenizer, charFilters, previousTokenFilters);
+        final Analyzer analyzer = buildSynonymAnalyzer(
+                context, tokenizer, charFilters, previousTokenFilters);
         synonymMap = buildSynonyms(analyzer);
         final String name = name();
         return new TokenFilterFactory() {
@@ -63,4 +66,12 @@ public class DynamicSynonymGraphTokenFilterFactory extends DynamicSynonymTokenFi
             }
         };
     }
+    Analyzer buildSynonymAnalyzer(
+            IndexService.IndexCreationContext context,
+            TokenizerFactory tokenizer,
+            List<CharFilterFactory> charFilters,
+            List<TokenFilterFactory> tokenFilters
+    ) {
+        return buildSynonymAnalyzer(tokenizer, charFilters, tokenFilters);
+    }    
 }

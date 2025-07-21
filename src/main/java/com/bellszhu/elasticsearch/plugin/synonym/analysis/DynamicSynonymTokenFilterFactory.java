@@ -26,6 +26,7 @@ import org.elasticsearch.index.analysis.CharFilterFactory;
 import org.elasticsearch.index.analysis.CustomAnalyzer;
 import org.elasticsearch.index.analysis.TokenFilterFactory;
 import org.elasticsearch.index.analysis.TokenizerFactory;
+import org.elasticsearch.index.IndexService;
 
 /**
  * @author bellszhu
@@ -95,13 +96,15 @@ public class DynamicSynonymTokenFilterFactory extends
                 "Call getChainAwareTokenFilterFactory to specialize this factory for an analysis chain first");
     }
 
-    public TokenFilterFactory getChainAwareTokenFilterFactory(
+    public TokenFilterFactory createPerAnalyzerSynonymGraphFactory(
+            IndexService.IndexCreationContext context,
             TokenizerFactory tokenizer,
             List<CharFilterFactory> charFilters,
             List<TokenFilterFactory> previousTokenFilters,
             Function<String, TokenFilterFactory> allFilters
     ) {
-        final Analyzer analyzer = buildSynonymAnalyzer(tokenizer, charFilters, previousTokenFilters);
+        final Analyzer analyzer = buildSynonymAnalyzer(
+                context, tokenizer, charFilters, previousTokenFilters);
         synonymMap = buildSynonyms(analyzer);
         final String name = name();
         return new TokenFilterFactory() {
@@ -206,4 +209,12 @@ public class DynamicSynonymTokenFilterFactory extends
         }
     }
 
+    Analyzer buildSynonymAnalyzer(
+            IndexService.IndexCreationContext context,
+            TokenizerFactory tokenizer,
+            List<CharFilterFactory> charFilters,
+            List<TokenFilterFactory> tokenFilters
+    ) {
+        return buildSynonymAnalyzer(tokenizer, charFilters, tokenFilters);
+    }
 }
