@@ -136,7 +136,7 @@ public class LocalSynonymFile implements SynonymFile {
      * @return the synonym path.
      */
     protected Path deepSearch() {
-        return env.configFile().resolve(location);
+        return env.configDir().resolve(location);
 //        // TODO
 //        SpecialPermission.check();
 //        return AccessController.doPrivileged((PrivilegedAction<Path>) () -> {
