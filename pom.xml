@@ -4,7 +4,7 @@
 
     <groupId>com.bellszhu.elasticsearch</groupId>
     <artifactId>elasticsearch-analysis-dynamic-synonym</artifactId>
-    <version>8.7.1</version>
+    <version>8.18.3</version>
     <packaging>jar</packaging>
     <name>elasticsearch-dynamic-synonym</name>
     <description>Analysis-plugin for synonym</description>
@@ -69,7 +69,7 @@
         <dependency>
             <groupId>org.codelibs.elasticsearch.module</groupId>
             <artifactId>analysis-common</artifactId>
-            <version>${project.version}</version>
+            <version>8.9.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -97,7 +97,7 @@
         <dependency>
             <groupId>org.codelibs</groupId>
             <artifactId>elasticsearch-cluster-runner</artifactId>
-            <version>${project.version}.0</version>
+            <version>8.14.1.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
