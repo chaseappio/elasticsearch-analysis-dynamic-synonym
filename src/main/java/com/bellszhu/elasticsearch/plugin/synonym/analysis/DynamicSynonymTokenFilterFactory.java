@@ -59,7 +59,7 @@ public class DynamicSynonymTokenFilterFactory extends AbstractTokenFilterFactory
                                             Environment    env,
                                             String         name,
                                             Settings       settings) throws IOException {
-        super(name, settings);
+        super(name);
 
         this.indexSettings = indexSettings;
         this.environment   = env;
