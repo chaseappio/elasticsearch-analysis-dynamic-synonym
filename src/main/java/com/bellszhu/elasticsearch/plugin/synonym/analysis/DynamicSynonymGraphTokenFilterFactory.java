@@ -8,59 +8,64 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
+import org.elasticsearch.index.IndexService;
 import org.elasticsearch.index.IndexSettings;
-import org.elasticsearch.index.analysis.AnalysisMode;
-import org.elasticsearch.index.analysis.CharFilterFactory;
-import org.elasticsearch.index.analysis.TokenFilterFactory;
-import org.elasticsearch.index.analysis.TokenizerFactory;
+import org.elasticsearch.index.analysis.*;
 
 public class DynamicSynonymGraphTokenFilterFactory extends DynamicSynonymTokenFilterFactory {
 
-    public DynamicSynonymGraphTokenFilterFactory(
-        IndexSettings indexSettings,Environment env, String name, Settings settings
-    ) throws IOException {
-        super(indexSettings,env, name, settings);
+    public DynamicSynonymGraphTokenFilterFactory(IndexSettings indexSettings,
+                                                 Environment    env,
+                                                 String         name,
+                                                 Settings       settings) throws IOException {
+        super(indexSettings, env, name, settings);
     }
 
-    @Override
-    public TokenStream create(TokenStream tokenStream) {
+    /** generic `create()` should never be called */
+    @Override public TokenStream create(TokenStream in) {
         throw new IllegalStateException(
-                "Call createPerAnalyzerSynonymGraphFactory to specialize this factory for an analysis chain first"
-        );
+                "Call getChainAwareTokenFilterFactory(...) first");
     }
 
     @Override
     public TokenFilterFactory getChainAwareTokenFilterFactory(
-            TokenizerFactory tokenizer, List<CharFilterFactory> charFilters,
-            List<TokenFilterFactory> previousTokenFilters,
-            Function<String, TokenFilterFactory> allFilters
-    ) {
-        final Analyzer analyzer = buildSynonymAnalyzer(tokenizer, charFilters, previousTokenFilters);
+            IndexService.IndexCreationContext context,
+            TokenizerFactory tokenizer,
+            List<CharFilterFactory> charFilters,
+            List<TokenFilterFactory> previousFilters,
+            Function<String, TokenFilterFactory> allFilters) {
+
+        final Analyzer analyzer = buildSynonymAnalyzer(
+                tokenizer, charFilters, previousFilters);
+
         synonymMap = buildSynonyms(analyzer);
-        final String name = name();
+        final String       myName = name();
+        final AnalysisMode mode   = getAnalysisMode();
+
         return new TokenFilterFactory() {
-            @Override
-            public String name() {
-                return name;
-            }
+
+            @Override public String name() { return myName; }
 
             @Override
-            public TokenStream create(TokenStream tokenStream) {
-                // fst is null means no synonyms
-                if (synonymMap.fst == null) {
-                    return tokenStream;
-                }
-                DynamicSynonymGraphFilter dynamicSynonymGraphFilter = new DynamicSynonymGraphFilter(
-                        tokenStream, synonymMap, false);
-                dynamicSynonymFilters.put(dynamicSynonymGraphFilter, 1);
+            public TokenStream create(TokenStream in) {
+                if (synonymMap.fst == null) return in;
 
-                return dynamicSynonymGraphFilter;
+                DynamicSynonymGraphFilter f =
+                        new DynamicSynonymGraphFilter(in, synonymMap, false);
+                dynamicFilters.put(f, 1);
+                return f;
             }
 
-            @Override
-            public AnalysisMode getAnalysisMode() {
-                return analysisMode;
-            }
+            @Override public TokenFilterFactory getSynonymFilter() { return IDENTITY_FILTER; }
+
+            @Override public AnalysisMode getAnalysisMode() { return mode; }
         };
+    }
+
+    /* helper used by the method above */
+    protected Analyzer buildSynonymAnalyzer(TokenizerFactory tokenizer,
+                                          List<CharFilterFactory> charFilters,
+                                          List<TokenFilterFactory> tokenFilters) {
+        return super.buildSynonymAnalyzer(tokenizer, charFilters, tokenFilters);
     }
 }

@@ -4,7 +4,7 @@
 
     <groupId>com.bellszhu.elasticsearch</groupId>
     <artifactId>elasticsearch-analysis-dynamic-synonym</artifactId>
-    <version>8.7.1</version>
+    <version>9.0.3</version>
     <packaging>jar</packaging>
     <name>elasticsearch-dynamic-synonym</name>
     <description>Analysis-plugin for synonym</description>
@@ -12,7 +12,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <elasticsearch.version>${project.version}</elasticsearch.version>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <elasticsearch.plugin.name>analysis-dynamic-synonym</elasticsearch.plugin.name>
         <elasticsearch.assembly.descriptor>${project.basedir}/src/main/assemblies/plugin.xml
         </elasticsearch.assembly.descriptor>
@@ -65,11 +67,17 @@
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>${elasticsearch.version}</version>
+            <exclusions>
+                <exclusion>
+                <groupId>org.codelibs.elasticsearch.module</groupId>
+                <artifactId>ingest-attachment</artifactId>
+                </exclusion>
+            </exclusions>            
         </dependency>
         <dependency>
             <groupId>org.codelibs.elasticsearch.module</groupId>
             <artifactId>analysis-common</artifactId>
-            <version>${project.version}</version>
+            <version>8.9.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -97,7 +105,7 @@
         <dependency>
             <groupId>org.codelibs</groupId>
             <artifactId>elasticsearch-cluster-runner</artifactId>
-            <version>${project.version}.0</version>
+            <version>8.14.1.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
